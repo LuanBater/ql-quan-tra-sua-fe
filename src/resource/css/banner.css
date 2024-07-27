@@ -1,0 +1,14 @@
+/* src/components/Banner.css */
+.banner {
+    width: 100%;
+    margin: 0 auto;
+/* Adjust this value as needed */
+  }
+  
+  .banner img {
+    width: 100%;
+    height: 150px; /* Đặt chiều cao cố định hoặc sử dụng height: auto để duy trì tỷ lệ */
+    object-fit: cover; /* Đảm bảo hình ảnh được cắt gọn để vừa với container */
+    display: block;
+  }
+  

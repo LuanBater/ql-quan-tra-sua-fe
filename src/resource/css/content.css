@@ -1,0 +1,59 @@
+/* src/components/Contents.css */
+.contents-container {
+    display: flex;
+    width: 100%;
+    margin-top: 3.6vw;
+    background-color: #fff4e6;
+  }
+  
+  .contents-left {
+    flex: 0 0 15%; /* Chia phần 20% cho thanh nav dọc */
+  }
+  
+  .vertical-nav {
+    background-color: #ddd; /* Màu nền thanh nav */
+    padding: 10px;
+    border-radius: 5px;
+    margin-left: 1vw;
+  }
+  
+  .vertical-nav ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .vertical-nav ul li {
+    margin-bottom: 10px;
+  }
+  
+  .vertical-nav ul li a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+    padding: 5px 10px;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .vertical-nav ul li a:hover {
+    background-color: #FFFF99;
+  }
+  
+  .contents-right {
+    flex: 1; /* Phần còn lại của center */
+    margin-left: 20px; /* Khoảng cách với phần trái */
+  }
+  
+  .functional-content {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Đổ bóng */
+  }
+  .vertical-nav ul li a.selected {
+    background-color: #f0f0f0; /* Màu nền cho mục được chọn */
+    color: red; /* Màu chữ cho mục được chọn */
+}
+.fullScreen{
+  background-color: #fff4e6;
+}
