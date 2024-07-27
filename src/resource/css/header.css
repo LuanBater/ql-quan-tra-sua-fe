@@ -1,0 +1,124 @@
+/* src/components/HeaderPage/HeaderPage.css */
+.header-page-container {
+  display: flex;
+  flex-direction: column; /* Thay đổi thành cột */
+  width: 100%;
+  height: 200px;
+  background-color: #fff4e6;
+}
+
+.header-page-top {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.header-page-left, .header-page-right {
+  flex: 0 0 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header-page-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo {
+  cursor: pointer;
+}
+
+.logo-img {
+  width: 100px; /* Điều chỉnh kích thước ảnh */
+  height: 100px; /* Điều chỉnh kích thước ảnh */
+  object-fit: contain; /* Đảm bảo ảnh không bị méo khi thay đổi kích thước */
+}
+
+.banner {
+  width: 100%;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+.banner img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.nav-bar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: #fff4e6;
+}
+
+.nav-bar ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  gap: 15px;
+}
+
+.nav-bar ul li {
+  display: inline;
+}
+
+.nav-bar ul li a {
+  text-decoration: none;
+  padding: 10px 20px;
+  background-color: #FFFF99;
+  border-radius: 5px;
+  color: #333;
+}
+
+.nav-bar ul li a:hover {
+  background-color: #ddd;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.user-info button {
+  margin-bottom: 10px;
+  padding: 10px 20px;
+  background-color:#FFFF99;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.user-info button:hover {
+  background-color: #ddd;
+}
+
+.user-details {
+  text-align: center;
+}
+
+.slick-dots li button {
+  width: 20px; /* Điều chỉnh kích thước của các nút trượt */
+  height: 20px; /* Điều chỉnh kích thước của các nút trượt */
+  border-radius: 50%; /* Làm tròn các nút trượt */
+  background-color: rgba(255, 255, 255, 0.8); /* Màu nền của các nút trượt */
+  border: none;
+  cursor: pointer;
+}
+
+.slick-dots li.slick-active button {
+  background-color: greenyellow; /* Màu nền của nút trượt được chọn */
+}
+
+.slick-prev,
+.slick-next {
+  display: none !important;
+}
