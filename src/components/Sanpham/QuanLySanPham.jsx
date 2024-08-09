@@ -23,7 +23,14 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import {menuItemsQL} from '../HeaderPage/Menu.js';
 import Header from '../HeaderPage/headerpage.jsx';
+import { useNavigate } from 'react-router-dom';
+
 function QuanLySanPham ({navItems}) {
+  const navigate = useNavigate();
+  if(localStorage.getItem('maquyen') !== "QL") {
+    navigate("/")
+  }
+  const user = localStorage.getItem("username")
   const [theLoaiList, setTheLoaiList] = useState([]);
   const [selectedTheLoai, setSelectedTheLoai] = useState('ALL');
   const [activeCategory, setActiveCategory] = useState('products'); // Default to products
@@ -459,7 +466,7 @@ const handleConfirmDeleteClose = () => {
        tylegiam: '',
        ngayapdung: '',
        ngaykt: '',
-       manv: 'QL01',
+       manv: user,
        loaigia: 'SP',
     });
     setIsUpdate(false);

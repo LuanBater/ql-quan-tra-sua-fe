@@ -21,10 +21,20 @@ import TextField from '@mui/material/TextField';
 import trasua from '../../resource/image/tra-sua-01.jpg';
 import Header from '../HeaderPage/headerpage.jsx';
 import { menuItemsKH } from '../HeaderPage/Menu.js';
-import { getDanhSachSanPhamBan, getDanhSachTopping ,taoDonHang,getDonHangDaDatKhach,getDonHangHoanThanhKhach} from '../../API/QLMuaHang.js';
-import { getDanhSachTheLoai ,fetchImage} from '../../API/QLSanPham.js';
+import { getDanhSachSanPhamBan, getDanhSachTopping ,taoDonHang,getDonHangDaDatKhach,getDonHangHoanThanhKhach,thanhToan} from '../../API/QLMuaHang.js';
+import { getDanhSachTheLoai ,fetchImage,formatDate} from '../../API/QLSanPham.js';
+import { KeyboardReturnOutlined } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const QuanLyBanHang = ({ navItems }) => {
+  const navigate = useNavigate();
+  if(localStorage.getItem('maquyen') === null) {
+    navigate("/login")
+  }
+  else if(localStorage.getItem('maquyen') !== 'KH') {
+    navigate("/")
+  }
+  const user = localStorage.getItem("username")
   const [activeCategory, setActiveCategory] = useState('danh-sach-san-pham');
   const [sanPhamList, setSanPhamList] = useState([]);
   const [theLoaiList, setTheLoaiList] = useState([]);
@@ -43,6 +53,7 @@ const QuanLyBanHang = ({ navItems }) => {
   const [DaDatList, setDaDatList] = useState([]);
   const [HoanThanhList, setHoanThanhList] = useState([]);
   const [imgSP, setImgSP] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
   const handleCategorySelect = (categoryId) => {
     switch (categoryId) {
       case 1:
@@ -74,7 +85,7 @@ const QuanLyBanHang = ({ navItems }) => {
   };
   const fetchDaDatList = async () => {
     try {
-      const data = await getDonHangDaDatKhach("KH01");
+      const data = await getDonHangDaDatKhach(user);
       setDaDatList(data);
     } catch (error) {
       console.error('Error fetching DaDat List:', error);
@@ -82,7 +93,7 @@ const QuanLyBanHang = ({ navItems }) => {
   };
   const fetchHoanThanhList = async () => {
     try {
-      const data = await getDonHangHoanThanhKhach("KH01");
+      const data = await getDonHangHoanThanhKhach(user);
       setHoanThanhList(data);
     } catch (error) {
       console.error('Error fetching HoanThanh List:', error);
@@ -180,6 +191,9 @@ const QuanLyBanHang = ({ navItems }) => {
     if (newQuantity >= 1) {
       setQuantity(newQuantity);
     }
+    else{
+      alert("Số lượng đặt phải lớn hơn 0!")
+    }
   };
 
   const handleSizeChange = (e) => {
@@ -216,7 +230,10 @@ const QuanLyBanHang = ({ navItems }) => {
   };
 
   const handlePlaceOrder = async () => {
-    // Lặp qua orderList để tạo các mục đơn lẻ
+    if (sdt === '' || deliveryAddress ==='') {
+      alert('Vui lòng không bỏ trống thông tin!');
+      return;
+    }
     const orders = orderList.map(item => ({
       idctdh: null,
       idctsp: item.idctsp,
@@ -229,18 +246,48 @@ const QuanLyBanHang = ({ navItems }) => {
   
     
     try {
-        await taoDonHang("KH01",sdt,deliveryAddress,parseInt(paymentMethod, 10),orders);     
+        await taoDonHang(user,sdt,deliveryAddress,parseInt(paymentMethod, 10),orders);     
+        if (parseInt(paymentMethod, 10) === 2)
+          {
+            try {
+              const data = await thanhToan(totalPrice);
+              if (data.status === "OK" && data.url) {
+                  // Chuyển hướng đến URL trả về từ API
+                  
+                  window.location.href = data.url;
+              } else {
+                  // Xử lý trường hợp không có URL hoặc trạng thái khác không phải OK
+                  alert("Lỗi thanh toán: " + (data.message || "Không có URL để chuyển hướng"));
+              }
+          } catch (error) {
+              console.error('Error creating order:', error);
+              alert("Lỗi thanh toán");
+          }
+          }
+
         handleCloseConfirmDialog();
         setOrderList([]);
         setSDT('');
         setDeliveryAddress('');
         setPaymentMethod(1);
+        alert('Đặt hàng thành công! Kiểm tra lại "Đơn hàng đã đặt"')
       } catch (error) {
         console.error('Error creating order:', error);
         alert("Lỗi tạo đơn hàng");
       }
   };
-  
+  useEffect(() => {
+    // Tính tổng tiền mỗi khi orderList thay đổi
+    const calculatedTotal = orderList.reduce((total, item) => {
+      const totalToppingPrice = item.listTopping && item.listTopping.length > 0
+        ? item.listTopping.reduce((sum, topping) => sum + topping.gia * topping.soluong, 0)
+        : 0;
+      return total + ((item.gia + totalToppingPrice) * item.soluong);
+    }, 0);
+    
+    setTotalPrice(calculatedTotal);
+  }, [orderList]);
+
   return (
     <div>
       <Header menuItems={menuItemsKH} />
@@ -340,17 +387,6 @@ const QuanLyBanHang = ({ navItems }) => {
 
                     return (
                         <TableRow key={index}>
-                        {/* <TableCell>
-                        {item.hinhanh ? (
-                        <img 
-                              src={imgSP.find(img => img.idsp === item.masp)?.image || item} 
-                              alt={`Ảnh sản phẩm`} 
-                              style={{ width: '100%' }}
-                          />
-                        ) : (
-                          <img src={trasua} alt={`Ảnh sản phẩm`} />
-                        )}
-                        </TableCell> */}
                         <TableCell sx={{ border: '1px solid #ccc' }}>{item.tensp}</TableCell>
                         <TableCell sx={{ border: '1px solid #ccc' }}>{item.size}</TableCell>
                         <TableCell sx={{ border: '1px solid #ccc' }}>{item.soluong}</TableCell>
@@ -428,7 +464,7 @@ const QuanLyBanHang = ({ navItems }) => {
                         {DaDatList.map((order) => (
                             <TableRow key={order.madonhang}>
                                 <TableCell sx={{ border: '1px solid #ccc' }}>{order.madonhang}</TableCell>
-                                <TableCell sx={{ border: '1px solid #ccc' }}>{order.ngaytao}</TableCell> 
+                                <TableCell sx={{ border: '1px solid #ccc' }}>{formatDate(order.ngaytao)}</TableCell> 
                                 <TableCell sx={{ border: '1px solid #ccc' }}>{order.diachi}</TableCell>
                                 <TableCell sx={{ border: '1px solid #ccc' }}>{order.sdt}</TableCell>
                                 <TableCell sx={{ border: '1px solid #ccc' }}>{order.thanhtoan === 1 ? 'Tiền mặt' : 'Chuyển khoản'}</TableCell>
@@ -496,7 +532,7 @@ const QuanLyBanHang = ({ navItems }) => {
                         {HoanThanhList.map((order) => (
                             <TableRow key={order.madonhang}>
                                 <TableCell sx={{ border: '1px solid #ccc' }}>{order.madonhang}</TableCell>
-                                <TableCell sx={{ border: '1px solid #ccc' }}>{order.ngaytao}</TableCell> 
+                                <TableCell sx={{ border: '1px solid #ccc' }}>{formatDate(order.ngaytao)}</TableCell> 
                                 <TableCell sx={{ border: '1px solid #ccc' }}>{order.diachi}</TableCell>
                                 <TableCell sx={{ border: '1px solid #ccc' }}>{order.sdt}</TableCell>
                                 <TableCell sx={{ border: '1px solid #ccc' }}>{order.thanhtoan === 1 ? 'Tiền mặt' : 'Chuyển khoản'}</TableCell>

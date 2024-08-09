@@ -100,7 +100,16 @@ export const updateKhachHang = async (data) => {
         const response = await api.post(`${THONG_TIN_API_URL}update-khach-hang`, data);
         return response.data;
     } catch (error) {
-        console.error('Error create PN:', error);
+        console.error('Error update KH:', error);
+        throw error;
+    }
+};
+export const updateThongTinNhanVien = async (data) => {
+    try {
+        const response = await api.post(`${THONG_TIN_API_URL}update-thong-tin-nhan-vien`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Error update NV:', error);
         throw error;
     }
 };
@@ -115,6 +124,22 @@ export const fetchImage = async (imageName) => {
     } catch (error) {
         console.error('Error fetching image:', error);
         throw error;
+    }
+};
+export const kiemTraUpdate = async (maquyen,makh,sdt,email) => {
+    try {
+        const response = await api.get(`${THONG_TIN_API_URL}kiem-tra-update`, {
+            params: { 
+                'maquyen': maquyen,
+                'makh': makh,
+                'sdt' : sdt,
+                'email':email
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching checking update:', error);
+        throw error; // Optionally, rethrow the error to handle it in the component
     }
 };
 export const formatDate = (dateString) => {

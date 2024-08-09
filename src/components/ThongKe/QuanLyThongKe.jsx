@@ -21,10 +21,15 @@ getDanhSachCPPS,
   updateCPPS ,formatDate,getHoaDonNgay,getHoaDonThang,getPhieuNhapThang
 } from '../../API/QLThongKe.js';
 import { TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const QuanLyThongKe = ({ navItems }) => {
+  const navigate = useNavigate();
+  if(localStorage.getItem('maquyen') !== "QL") {
+    navigate("/")
+  }
   const [activeCategory, setActiveCategory] = useState('hoa-don-trong-ngay');
-  const [thongKeList, setThongKeList] = useState([]);
+  const user = localStorage.getItem("username")
   const [CPPSList, setCPPSList] = useState([]);
   const [hoaDonNgayList, setHoaDonNgayList] = useState([]);
   const [hoaDonThangList, setHoaDonThangList] = useState([]);
@@ -61,10 +66,6 @@ const QuanLyThongKe = ({ navItems }) => {
         await fetchNhapTrongThang(selectedMonth,selectedYear);
         break;
       case 4:
-        setActiveCategory('thu-chi-thang');
-        // await fetchTongHopThuChiThang();
-        break;
-      case 5:
         setActiveCategory('chi-phi-phat-sinh');
         await fetchChiPhiPhatSinh();
         break;
@@ -127,7 +128,7 @@ const QuanLyThongKe = ({ navItems }) => {
         chiphi: '', 
         ngay: '', 
         mota: '', 
-        manv: 'QL01', 
+        manv: user, 
         tennv: ''
     });
     setIsUpdate(false);
@@ -359,8 +360,8 @@ const QuanLyThongKe = ({ navItems }) => {
                         {hoaDonThangList.map((row) => (
                           <TableRow key={row.soluong}>
                             <TableCell sx={{ border: '1px solid #ccc' }}>{row.soluong}</TableCell>
-                            <TableCell sx={{ border: '1px solid #ccc' }}>{row.ngay}</TableCell>
-                            <TableCell sx={{ border: '1px solid #ccc' }}>{row.tong.toLocaleString('vi-VN')}</TableCell>
+                            <TableCell sx={{ border: '1px solid #ccc' }}>{formatDate(row.ngay)}</TableCell>
+                            <TableCell sx={{ border: '1px solid #ccc' }}>{row.tong.toLocaleString('vi-VN')}đ</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -412,7 +413,7 @@ const QuanLyThongKe = ({ navItems }) => {
                 ) : (
                   <TableContainer component={Paper}>
                     <Typography variant="h6" sx={{ padding: '16px', textAlign: 'center' }}>
-                      Thống kê hóa đơn trong tháng {temp1}/{temp2}
+                      Thống kê nhập hàng trong tháng {temp1}/{temp2}
                     </Typography>
                     <Table sx={{ border: '1px solid #ccc' }}>
                       <TableHead>
@@ -426,7 +427,7 @@ const QuanLyThongKe = ({ navItems }) => {
                         {hoaDonThangList.map((row) => (
                           <TableRow key={row.soluong}>
                             <TableCell sx={{ border: '1px solid #ccc' }}>{row.soluong}</TableCell>
-                            <TableCell sx={{ border: '1px solid #ccc' }}>{row.ngay}</TableCell>
+                            <TableCell sx={{ border: '1px solid #ccc' }}>{formatDate(row.ngay)}</TableCell>
                             <TableCell sx={{ border: '1px solid #ccc' }}>{row.tong.toLocaleString('vi-VN')}</TableCell>
                           </TableRow>
                         ))}
@@ -434,12 +435,6 @@ const QuanLyThongKe = ({ navItems }) => {
                     </Table>
                   </TableContainer>
                 )}
-              </div>
-            )}
-            {activeCategory === 'thu-chi-thang' && (
-              <div className="order-list">
-                {/* <h2>Thống kê tổng hợp thu chi tháng</h2>
-                <TongHopThuChiThangTable data={thongKeList} /> */}
               </div>
             )}
             {activeCategory === 'chi-phi-phat-sinh' && (
@@ -471,7 +466,7 @@ const QuanLyThongKe = ({ navItems }) => {
                             {CPPSList.map((item, index) => (
                                 <TableRow key={index}>
                                     <TableCell sx={{ border: '1px solid #ccc' }}>{item.macpps}</TableCell>
-                                    <TableCell sx={{ border: '1px solid #ccc' }}>{item.chiphi}</TableCell>
+                                    <TableCell sx={{ border: '1px solid #ccc' }}>{item.chiphi.toLocaleString('vi-VN')}đ</TableCell>
                                     <TableCell sx={{ border: '1px solid #ccc' }}>{formatDate(item.ngay)}</TableCell>
                                     <TableCell sx={{ border: '1px solid #ccc' }}>{item.mota}</TableCell>
                                     <TableCell sx={{ border: '1px solid #ccc' }}>
@@ -554,101 +549,5 @@ const QuanLyThongKe = ({ navItems }) => {
     </div>
   );
 };
-
-// const HoaDonTrongNgayTable = ({ data }) => (
-//   <Table sx={{ border: '1px solid #ccc' }}>
-//     <TableHead>
-//       <TableRow>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Mã Hóa Đơn</TableCell>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Khách Hàng</TableCell>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Ngày</TableCell>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Tổng Tiền</TableCell>
-//       </TableRow>
-//     </TableHead>
-//     <TableBody>
-//       {data.map((item, index) => (
-//         <TableRow key={index}>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.maHD}</TableCell>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.khachHang}</TableCell>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.ngay}</TableCell>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.tongTien}</TableCell>
-//         </TableRow>
-//       ))}
-//     </TableBody>
-//   </Table>
-// );
-
-// const HoaDonTrongThangTable = ({ data }) => (
-//   <Table sx={{ border: '1px solid #ccc' }}>
-//     <TableHead>
-//       <TableRow>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Mã Hóa Đơn</TableCell>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Khách Hàng</TableCell>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Ngày</TableCell>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Tổng Tiền</TableCell>
-//       </TableRow>
-//     </TableHead>
-//     <TableBody>
-//       {data.map((item, index) => (
-//         <TableRow key={index}>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.maHD}</TableCell>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.khachHang}</TableCell>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.ngay}</TableCell>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.tongTien}</TableCell>
-//         </TableRow>
-//       ))}
-//     </TableBody>
-//   </Table>
-// );
-
-// const NhapTrongThangTable = ({ data }) => (
-//   <Table sx={{ border: '1px solid #ccc' }}>
-//     <TableHead>
-//       <TableRow>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Mã Nhập</TableCell>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Nhà Cung Cấp</TableCell>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Ngày</TableCell>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Tổng Nhập</TableCell>
-//       </TableRow>
-//     </TableHead>
-//     <TableBody>
-//       {data.map((item, index) => (
-//         <TableRow key={index}>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.maNhap}</TableCell>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.nhaCungCap}</TableCell>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.ngay}</TableCell>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.tongNhap}</TableCell>
-//         </TableRow>
-//       ))}
-//     </TableBody>
-//   </Table>
-// );
-
-// const TongHopThuChiThangTable = ({ data }) => (
-//   <Table sx={{ border: '1px solid #ccc' }}>
-//     <TableHead>
-//       <TableRow>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Ngày</TableCell>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Doanh Thu</TableCell>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Chi Phí</TableCell>
-//         <TableCell sx={{ border: '1px solid #ccc' }}>Lợi Nhuận</TableCell>
-//       </TableRow>
-//     </TableHead>
-//     <TableBody>
-//       {data.map((item, index) => (
-//         <TableRow key={index}>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.ngay}</TableCell>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.doanhThu}</TableCell>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.chiPhi}</TableCell>
-//           <TableCell sx={{ border: '1px solid #ccc' }}>{item.loiNhuan}</TableCell>
-//         </TableRow>
-//       ))}
-//     </TableBody>
-//   </Table>
-// );
-
-// const ChiPhiPhatSinhTable = ({ data, onEdit, onDelete }) => (
-  
-// );
 
 export default QuanLyThongKe;

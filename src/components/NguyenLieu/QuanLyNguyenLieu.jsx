@@ -20,8 +20,14 @@ import TableRow from '@mui/material/TableRow';
 import MenuItem from '@mui/material/MenuItem';
 import { menuItemsQL } from '../HeaderPage/Menu.js';
 import Header from '../HeaderPage/headerpage.jsx';
-
+import { useNavigate } from 'react-router-dom';
 function QuanLyNguyenLieu({ navItems }) {
+   
+    const navigate = useNavigate();
+  if(localStorage.getItem('maquyen') !== "QL") {
+    navigate("/")
+  }
+    const user = localStorage.getItem("username")
     const [activeCategory, setActiveCategory] = useState('nguyen-lieu');
     const [nguyenLieuList, setNguyenLieuList] = useState([]);
     const [openAdd, setOpenAdd] = useState(false);
@@ -40,8 +46,8 @@ function QuanLyNguyenLieu({ navItems }) {
     const [selectedFile, setSelectedFile] = useState(null);
     const [selectedNguyenLieu, setSelectedNguyenLieu] = useState(null);
     const [isEditing, setIsEditing] = useState(false); // State để xác định chế độ
-    const [NLSPList, setNLPSList] = useState([]);
-    const [NLTSSelected, setNLPSSelected] = useState({});
+    const [NLPSList, setNLPSList] = useState([]);
+    const [NLPSSelected, setNLPSSelected] = useState({});
     const fetchNguyenLieu = async () => {
         try {
             const data = await getDanhSachNguyenLieu();
@@ -213,7 +219,7 @@ function QuanLyNguyenLieu({ navItems }) {
     };
     const handleClickOpenNLPS = () => {
         setNLPSSelected({
-            manv: 'QL01',
+            manv: user,
             tennv:'',
             manl: '',
             tennl: '',
@@ -238,7 +244,7 @@ function QuanLyNguyenLieu({ navItems }) {
     };
     const handleXoaNLPSSubmit = async (nlps) => {
         try {
-            await xoaNguyenLieuPhatSinh(NLTSSelected);
+            await xoaNguyenLieuPhatSinh(NLPSSelected);
             await fetchNLPS();
             handleXoaNLPSClose();
         } catch (error) {
@@ -250,7 +256,7 @@ function QuanLyNguyenLieu({ navItems }) {
         if (isUpdate)
         {
             try {
-                await updateNguyenLieuPhatSinh(NLTSSelected);
+                await updateNguyenLieuPhatSinh(NLPSSelected);
                 await fetchNLPS();
                 handleClickCloseNLPS();
             } catch (error) {
@@ -258,8 +264,12 @@ function QuanLyNguyenLieu({ navItems }) {
             }
         }
         else{
+            if (NLPSSelected.soluong < 0) {
+            alert('Số lượng phải lớn hơn 0!');
+            return;
+            }
             try {
-                await themNguyenLieuPhatSinh(NLTSSelected);
+                await themNguyenLieuPhatSinh(NLPSSelected);
                 await fetchNLPS();
                 handleClickCloseNLPS();
             } catch (error) {
@@ -270,7 +280,7 @@ function QuanLyNguyenLieu({ navItems }) {
     const handleNLPSChange = (e) => {
         const { name, value } = e.target;
         setNLPSSelected({
-            ...NLTSSelected,
+            ...NLPSSelected,
             [name]: value
         });
     };
@@ -433,7 +443,7 @@ function QuanLyNguyenLieu({ navItems }) {
                           </span>
                             
                             <div className="order-list">
-                            {NLSPList.length === 0 ? (
+                            {NLPSList.length === 0 ? (
                               <p variant="h6" align="center" style={{ padding: '20px' }}>
                                 Chưa có nguyên liệu phát sinh
                               </p>
@@ -451,7 +461,7 @@ function QuanLyNguyenLieu({ navItems }) {
                                   </TableRow>
                               </TableHead>
                               <TableBody>
-                                      {NLSPList.map((nlps) => (
+                                      {NLPSList.map((nlps) => (
                                           <TableRow key={nlps.manv && nlps.manl && nlps.ngay}>
                                               <TableCell sx={{ border: '1px solid #ccc' }}>{nlps.manv} - {nlps.tennv}</TableCell>
                                               <TableCell sx={{ border: '1px solid #ccc' }}>{nlps.manl} - {nlps.tennl}</TableCell>
@@ -486,7 +496,7 @@ function QuanLyNguyenLieu({ navItems }) {
                                             select
                                             fullWidth
                                             disabled={isUpdate}
-                                            value={NLTSSelected.manl}
+                                            value={NLPSSelected.manl}
                                             onChange={handleNLPSChange}
                                         >
                                             {nguyenLieuList.map((nl) => (
@@ -506,7 +516,7 @@ function QuanLyNguyenLieu({ navItems }) {
                                             InputLabelProps={{
                                                 shrink: true,
                                             }}
-                                            value={NLTSSelected.ngay}
+                                            value={NLPSSelected.ngay}
                                             onChange={handleNLPSChange}
                                         />
                                             <TextField
@@ -516,7 +526,7 @@ function QuanLyNguyenLieu({ navItems }) {
                                             name="soluong"
                                             label="Số lượng"
                                             fullWidth
-                                            value={NLTSSelected.soluong}
+                                            value={NLPSSelected.soluong}
                                             onChange={handleNLPSChange}
                                         />
                                         <TextField
@@ -525,7 +535,7 @@ function QuanLyNguyenLieu({ navItems }) {
                                             name="mota"
                                             label="Mô tả"
                                             fullWidth
-                                            value={NLTSSelected.mota}
+                                            value={NLPSSelected.mota}
                                             onChange={handleNLPSChange}
                                         />
                                     </DialogContent>
@@ -541,7 +551,7 @@ function QuanLyNguyenLieu({ navItems }) {
                                 <Dialog open={openXoaNLPS} onClose={handleXoaNLPSClose}>
                                     <DialogTitle>Xóa nguyên liệu phát sinh</DialogTitle>
                                     <DialogContent>
-                                        <p>Bạn có chắc chắn muốn xóa nguyên liệu phát sinh {NLTSSelected.manl} - {NLTSSelected.tennl} -  ngày {formatDate(NLTSSelected.ngay)} không?</p>
+                                        <p>Bạn có chắc chắn muốn xóa nguyên liệu phát sinh {NLPSSelected.manl} - {NLPSSelected.tennl} -  ngày {formatDate(NLPSSelected.ngay)} không?</p>
                                     </DialogContent>
                                     <DialogActions>
                                         <Button onClick={handleXoaNLPSClose} color="secondary">

@@ -17,8 +17,12 @@ import TableRow from '@mui/material/TableRow';
 import { menuItemsQL } from '../HeaderPage/Menu.js';
 import Header from '../HeaderPage/headerpage.jsx';
 import { formatDate } from '../../API/QLSanPham.js';
-
+import { useNavigate } from 'react-router-dom';
 const QuanLyNhapHang = ({ navItems }) => {
+  const navigate = useNavigate();
+  if(localStorage.getItem('maquyen') !== "QL") {
+    navigate("/")
+  }  const user = localStorage.getItem("username")
   const [activeCategory, setActiveCategory] = useState('don-dat-mua');
   const [donDatMuaList, setDonDatMuaList] = useState([]);
   const [phieuNhapList, setPhieuNhapList] = useState([]);
@@ -133,11 +137,18 @@ const QuanLyNhapHang = ({ navItems }) => {
   };
 
   const handleSaveOrder = async () => {
+    
     const order = {
-      manv: 'QL01', // ID nhân viên quản lý, có thể thay đổi nếu cần
+      manv: user, // ID nhân viên quản lý, có thể thay đổi nếu cần
       mancc: selectedNCC,
       listNL: nguyenLieuOrder
     };
+    const hasSoluongGreaterThanZero = order.listNL.some(nl => nl.soluong <= 0);
+
+  if (hasSoluongGreaterThanZero) {
+    alert("Tất cả nguyên liệu trong danh sách phải có số lượng lớn hơn 0.");
+    return;
+  }
     try {
       await taoDonDatMua(order);
       handleClose();
@@ -151,11 +162,18 @@ const QuanLyNhapHang = ({ navItems }) => {
         ...nl,
         gianhap: parseInt(nl.gianhap) || 0 // Chuyển đổi giá nhập thành số, nếu không thể thì dùng giá trị mặc định 0
       }));
+   
     const input = {
       madondat: selectedDonDatMua.madondat,
-      manv: 'QL01', 
+      manv: user, 
       listNL: updatedData
     };
+    const hasSoluongGreaterThanZero = input.listNL.some(nl => nl.gianhap <= 0);
+
+    if (hasSoluongGreaterThanZero) {
+      alert("Tất cả nguyên liệu trong danh sách phải có giá nhập lớn hơn 0.");
+      return;
+    }
     try {
       await taoPhieuNhap(input);
       handleClose();
@@ -341,10 +359,13 @@ const handleClickCloseNCC = async ()=>
                         <p>Ngày đặt: {formatDate(ddm.ngaydat)}</p>
                         <p>Nhân viên đặt: {ddm.manv} - {ddm.tennv}</p>
                         <div className="product-actions">
-                          <Button variant="outlined" onClick={() => handleTaoPN(ddm)}>Tạo phiếu nhập</Button>
-                          <Button variant="outlined" onClick={() => handleViewDetails(ddm)} >
-                            Xem chi tiết
-                          </Button>
+                          
+                        {ddm.danhap === 1 ? (
+                          <span style={{ color: 'red', marginTop: '10px' }}>Đã nhập</span>
+                        ) : (
+                          <Button variant="outlined" onClick={() => handleTaoPN(ddm)}>Tạo phiếu nhập</Button>
+                        )}
+                        <Button variant="outlined" onClick={() => handleViewDetails(ddm)}>Xem chi tiết</Button>
                         </div>
                       </div>
                     </div>
@@ -532,7 +553,7 @@ const handleClickCloseNCC = async ()=>
                  {orderDetails && (
                     <>
                     <h3>ID Đơn đặt mua: {selectedDonDatMua.madondat}</h3>
-                  <p>Nhân viên nhập: QL01-Nguyen Luan</p>
+                  <p>Nhân viên nhập: {user}</p>
                     <Table>
                       <TableHead>
                         <TableRow>

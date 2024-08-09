@@ -64,6 +64,7 @@ export const getHoaDonNgay = async (ngay) => {
     }
 };
 export const getHoaDonThang = async (thang,nam) => {
+
     try {
         const response = await api.get(`${THONG_KE_API_URL}lay-hoa-don-thang`, {
             params: { 'thang': thang,
