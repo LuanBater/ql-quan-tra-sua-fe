@@ -57,3 +57,14 @@
 .fullScreen{
   background-color: #fff4e6;
 }
+.banner-container {
+  display: block;
+  margin-top: 3.6vw;
+}
+
+.banner-img {
+  height: 400px;
+  width: 100%;
+  object-fit: cover;
+  display: block;
+}

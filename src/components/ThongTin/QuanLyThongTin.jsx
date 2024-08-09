@@ -25,9 +25,14 @@ import TableRow from '@mui/material/TableRow';
 import Header from '../HeaderPage/headerpage.jsx';
 import { menuItemsQL } from '../HeaderPage/Menu.js';
 import { getDanhSachNhanVien, getDanhSachKhachHang,formatDate,fetchImage,themNhanVien,updateNhanVien,changeQuyen,changeNghiLam, updateKhachHang} from '../../API/QLThongTin.js'; // Update import paths
+import { useNavigate } from 'react-router-dom';
 
 
 const QuanLyThongTin = ({navItems}) => {
+  const navigate = useNavigate();
+  if(localStorage.getItem('maquyen') !== "QL") {
+    navigate("/")
+  }
   const [activeCategory, setActiveCategory] = useState('danh-sach-nhan-vien');
   const [danhSachNhanVien, setDanhSachNhanVien] = useState([]);
   const [danhSachKhachHang, setDanhSachKhachHang] = useState([]);

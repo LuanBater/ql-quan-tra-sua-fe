@@ -10,6 +10,7 @@ import QuanLyBanHang from './components/QuanLyBanHang/QuanLyBanHang';
 import QuanLyDonHang from './components/QuanLyBanHang/QuanLyDonHang';
 import QuanLyThongTin from './components/ThongTin/QuanLyThongTin';
 import QuanLyThongKe from './components/ThongKe/QuanLyThongKe';
+import Login from './components/Login/Login.jsx'
 export default function QLTS() {
   return (
     <BrowserRouter>
@@ -27,6 +28,7 @@ export default function QLTS() {
           <Route path="don-hang" element={<QuanLyDonHang navItems={QLDHItems} />} />
           {/* Khách Hàng  */}
           <Route path="mua-hang" element={<QuanLyBanHang navItems={QLMHItems} />} />
+          <Route path="login" element={<Login />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,4 +1,4 @@
-import api,{NGUYEN_LIEU_API_URL,SAN_PHAM_API_URL,MUA_HANG_API_URL} from "./apiConfig";
+import api,{THANH_TOAN_API_URL,SAN_PHAM_API_URL,MUA_HANG_API_URL} from "./apiConfig";
 export const getDanhSachSanPhamBan = async (maloai) => {
     try {
         const response = await api.get(`${SAN_PHAM_API_URL}lay-danh-sach-sp-ban`, {
@@ -89,10 +89,12 @@ export const getHoaDon = async () => {
 };
 export const xemHoaDon = async (madonhang) => {
     try {
-        const response = await api.get(`${MUA_HANG_API_URL}xem-hoa-don`,madonhang);
+        const response = await api.get(`${MUA_HANG_API_URL}xem-hoa-don`, {
+            params: { 'madonhang': madonhang},
+        });
         return response.data;
     } catch (error) {
-        console.error('Error fetching the list of HTK:', error);
+        console.error('Error fetching the list of DDK:', error);
         throw error; // Optionally, rethrow the error to handle it in the component
     }
 };
@@ -115,6 +117,17 @@ export const hoanThanhDonHang = async (data) => {
     } catch (error) {
         console.error('Error create PN:', error);
         throw error;
+    }
+};
+export const thanhToan = async (amount) => {
+    try {
+        const response = await api.get(`${THANH_TOAN_API_URL}create-payment`, {
+            params: { 'amount': amount},
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching the list of DDK:', error);
+        throw error; // Optionally, rethrow the error to handle it in the component
     }
 };
 export const formatDate = (dateString) => {

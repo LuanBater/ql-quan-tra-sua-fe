@@ -33,15 +33,15 @@ export const menuItemsQL = [
     // Add more items as needed
   ];
   export const QLMHItems = [
-    { id: 1, name: 'Danh sách sản phảm', link: '/danh-sach-san-pham' },
+    { id: 1, name: 'Danh sách sản phẩm', link: '/danh-sach-san-pham' },
     { id: 2, name: 'Giỏ hàng', link: '/gio-hang' },
     { id: 3, name: 'Đơn hàng đã đặt', link: '/don-hang-da-dat' },
     { id: 4, name: 'Lịch sử mua hàng', link: '/lich-su-mua-hang' }
     // Add more items as needed
   ];
   export const QLDHItems = [
-    { id: 1, name: 'Đơn hàng chờ duyệt', link: 'don-hang/don-dat-cho-duyet' },
-    { id: 2, name: 'Đơn hàng đã hoàn thành', link: 'don-hang/don-hang-da-hoan-thanh' },
+    { id: 1, name: 'Đơn hàng chờ duyệt', link: '/don-dat-cho-duyet' },
+    { id: 2, name: 'Đơn hàng đã hoàn thành', link: '/don-hang-da-hoan-thanh' },
     { id: 3, name: 'Hóa Đơn', link: '/hoa-don' }
     // Add more items as needed
   ];
@@ -54,7 +54,6 @@ export const menuItemsQL = [
     { id: 1, name: 'Thống kê doanh thu trong ngày', link: 'hoa-don-ngay' },
     { id: 2, name: 'Thống kê doanh thu trong tháng', link: 'hoa-don-thang' },
     { id: 3, name: 'Thống kê nhập hàng trong tháng', link: 'nhap-hang-thang' },
-    { id: 4, name: 'Thống kê tổng hợp thu chi trong tháng', link: 'thu-chi-thang' },
-    { id: 5, name: 'Chi phí phát sinh', link: 'chi-phi-phat-sinh' }
+    { id: 4, name: 'Chi phí phát sinh', link: 'chi-phi-phat-sinh' }
     // Add more items as needed
   ];

@@ -36,7 +36,11 @@
   height: 100px; /* Điều chỉnh kích thước ảnh */
   object-fit: contain; /* Đảm bảo ảnh không bị méo khi thay đổi kích thước */
 }
-
+.button-img {
+  width: 30px; /* Điều chỉnh kích thước ảnh */
+  height: 30px; /* Điều chỉnh kích thước ảnh */
+  object-fit: contain; /* Đảm bảo ảnh không bị méo khi thay đổi kích thước */
+}
 .banner {
   width: 100%;
   margin: 0 auto;
