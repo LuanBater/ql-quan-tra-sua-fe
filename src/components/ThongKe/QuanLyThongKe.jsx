@@ -280,21 +280,54 @@ const QuanLyThongKe = ({ navItems }) => {
                     <Table sx={{ border: '1px solid #ccc' }}>
                         <TableHead>
                             <TableRow>
-                                <TableCell sx={{ border: '1px solid #ccc' }}>Mã hóa đơn</TableCell>
-                                <TableCell sx={{ border: '1px solid #ccc' }}>Mã đơn hàng</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc' ,width:'50px'}}>Mã hóa đơn</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc' ,width:'50px'}}>Mã đơn hàng</TableCell>
                                 <TableCell sx={{ border: '1px solid #ccc' }}>Ngày xuất</TableCell>
-                                <TableCell sx={{ border: '1px solid #ccc' }}>MST</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc' ,width:'50px'}}>MST</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc' ,width:'150px'}}>Nhân viên duyệt</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc' ,width:'150px' }}>Khách hàng</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc' }}>Chi tiết đơn</TableCell>
                                 <TableCell sx={{ border: '1px solid #ccc' }}>Tổng giá</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {hoaDonNgayList.map((item, index) => (
+                            {hoaDonNgayList.map((hoaDon, index) => (
                                 <TableRow key={index}>
-                                    <TableCell sx={{ border: '1px solid #ccc' }}>{item.mahoadon}</TableCell>
-                                    <TableCell sx={{ border: '1px solid #ccc' }}>{item.madonhang}</TableCell>
-                                    <TableCell sx={{ border: '1px solid #ccc' }}>{formatDate(item.ngayxuat)}</TableCell>
-                                    <TableCell sx={{ border: '1px solid #ccc' }}>{item.mst}</TableCell>
-                                    <TableCell sx={{ border: '1px solid #ccc' }}>{item.tonggia.toLocaleString('vi-VN') }</TableCell>
+                                    <TableCell sx={{ border: '1px solid #ccc' }}>{hoaDon.mahoadon}</TableCell>
+                                    <TableCell sx={{ border: '1px solid #ccc' }}>{hoaDon.madonhang}</TableCell>
+                                    <TableCell sx={{ border: '1px solid #ccc' }}>{formatDate(hoaDon.ngayxuat)}</TableCell>
+                                    <TableCell sx={{ border: '1px solid #ccc' }}>{hoaDon.mst}</TableCell>
+                                    <TableCell sx={{ border: '1px solid #ccc' }}>{hoaDon.manv} - {hoaDon.tennv}</TableCell>
+                                    <TableCell sx={{ border: '1px solid #ccc' }}>{hoaDon.makh}-{hoaDon.tenkh} </TableCell>
+                                    <TableCell sx={{ border: '1px solid #ccc' }}>
+                                      {hoaDon.ctdh.map((item) => (
+                                          <div key={item.idctdh}>
+                                              <div>
+                                                  <strong>Sản phẩm:</strong> {item.tensp} - {item.masize}
+                                              </div>
+                                              <div>
+                                                  <strong>Số lượng:</strong> {item.soluong}
+                                              </div>
+                                              <div>
+                                                  <strong>Giá:</strong> {item.gia.toLocaleString('vi-VN')}đ
+                                              </div>
+                                              <div>
+                                                  <strong>Topping:</strong>
+                                                  {item.listCT_Topping.length > 0 ? (
+                                                      item.listCT_Topping.map((topping) => (
+                                                          <div key={topping.idctsp}>
+                                                              {topping.tensp} - {topping.soluong} - {topping.gia.toLocaleString('vi-VN')}đ
+                                                          </div>
+                                                      ))
+                                                  ) : (
+                                                      'Không có topping'
+                                                  )}
+                                              </div>
+                                              <hr />
+                                          </div>
+                                      ))}
+                                  </TableCell>
+                                    <TableCell sx={{ border: '1px solid #ccc' }}>{hoaDon.tonggia.toLocaleString('vi-VN') }</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
