@@ -325,7 +325,7 @@ function QuanLySanPham ({navItems}) {
       manl: newNguyenLieu, // Assuming manl is the ID of nguyen lieu
       tennl: newTenNL,
       soluong: newSoLuong,
-      mota: '', // You may add description here if needed
+      mota: newMota, // You may add description here if needed
     };
     setCongThuc([...congThuc, newIngredient]);
 

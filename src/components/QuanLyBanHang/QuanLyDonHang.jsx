@@ -339,12 +339,12 @@ const handleHoanThanhClick = async(order) =>{
                       <TableCell colSpan={8} ><h2 style={{ textAlign: 'center' }}>Danh sách hóa đơn</h2></TableCell>
                     </TableRow>
                   <TableRow>
-                          <TableCell sx={{ border: '1px solid #ccc' }}>Số hóa đơn</TableCell>
-                          <TableCell sx={{ border: '1px solid #ccc' }}>Mã đơn hàng</TableCell>
-                          <TableCell sx={{ border: '1px solid #ccc' }}>Ngày xuất</TableCell>
-                          <TableCell sx={{ border: '1px solid #ccc' }}>MST</TableCell>
-                          <TableCell sx={{ border: '1px solid #ccc' }}>Nhân viên duyệt</TableCell>
-                          <TableCell sx={{ border: '1px solid #ccc' }}>Khách hàng</TableCell>
+                  <TableCell sx={{ border: '1px solid #ccc' ,width:'50px'}}>Mã hóa đơn</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc' ,width:'50px'}}>Mã đơn hàng</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc' }}>Ngày xuất</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc' ,width:'50px'}}>MST</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc' ,width:'150px'}}>Nhân viên duyệt</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc' ,width:'150px' }}>Khách hàng</TableCell>
                           <TableCell sx={{ border: '1px solid #ccc' }}>Chi tiết đơn hàng</TableCell>
                           <TableCell sx={{ border: '1px solid #ccc' }}>Tổng giá</TableCell>
                       </TableRow>
