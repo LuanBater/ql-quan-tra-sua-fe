@@ -25,7 +25,7 @@
 
 .product-item img {
   width: 250px;
-  height: auto;
+  height: 250px;
   border-radius: 5px;
 }
 
@@ -74,14 +74,14 @@
   text-align: center; /* Căn giữa chữ */
   text-decoration: none; /* Không gạch chân */
   display: inline-block; /* Hiển thị theo dòng */
-  font-size: 10px; /* Kích thước chữ */
+  font-size: 13px; /* Kích thước chữ */
   margin: 5px 2px; /* Khoảng cách giữa các nút */
   cursor: pointer; /* Con trỏ chuột dạng bàn tay */
   border-radius: 4px; /* Bo góc */
 }
 
 .product-actions button:hover {
-  background-color: #45a049; /* Màu nền khi rê chuột */
+  background-color: #045a08; /* Màu nền khi rê chuột */
 }
 
 .product-actions button:active {
@@ -109,4 +109,55 @@ html, body {
   margin: 0;
   padding: 0;
   background-color: #fff4e6;
+}
+.right-aligned-button {
+  display: block;          /* Đảm bảo nút được coi là một khối độc lập */
+  margin-left: auto;       /* Đẩy nút sang phải */
+  margin-right: 0;
+  border: 10px solid white;  /* Thêm khung */
+  padding: 16px 16px;       /* Điều chỉnh khoảng cách trong nút */
+  border-radius: 10px;      /* Bo tròn góc nút (tùy chọn) */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Tạo hiệu ứng đổ bóng */
+}
+/* Căn chỉnh các phần tử trong một hàng */
+/* Căn chỉnh các phần tử trong một hàng */
+.theloai-container {
+  display: flex;
+  justify-content: space-between; /* Căn đều các phần tử */
+  align-items: center; /* Căn chỉnh các phần tử theo chiều dọc */
+  margin-bottom: 20px; /* Khoảng cách giữa các phần tử */
+}
+
+.theloai-selector,
+.search-container {
+  flex: 1; /* Mỗi phần tử chiếm không gian đều */
+  margin-right: 10px; /* Khoảng cách giữa các phần tử */
+}
+
+.search-container {
+  display: flex;
+  flex-direction: row; /* Để label và input nằm ngang với nhau */
+  align-items: center; /* Căn giữa các phần tử theo chiều dọc */
+}
+
+.search-container label {
+  margin-right: 10px; /* Khoảng cách giữa label và input */
+  font-size: 14px;
+  width: 80px;
+  font-weight: bold;
+}
+
+.search-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%; /* Đảm bảo ô tìm kiếm rộng đầy đủ */
+  font-size: 16px;
+  box-sizing: border-box; /* Đảm bảo padding không làm giảm chiều rộng */
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-left: 20px; /* Khoảng cách với các phần tử trên cùng */
 }

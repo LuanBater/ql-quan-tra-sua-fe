@@ -1,4 +1,4 @@
-import api,{SAN_PHAM_API_URL,NGUYEN_LIEU_API_URL} from "../API/apiConfig";
+import api,{SAN_PHAM_API_URL,NGUYEN_LIEU_API_URL, THONG_KE_API_URL} from "../API/apiConfig";
 export const getDanhSachSanPham = async (maloai) => {
     try {
         const response = await api.get(`${SAN_PHAM_API_URL}lay-danh-sach-sp`, {
@@ -54,6 +54,19 @@ export const getDanhSachCongThuc = async (masp) => {
         return response.data;
     } catch (error) {
         console.error('Error fetching the list of bang gia:', error);
+        throw error; // Optionally, rethrow the error to handle it in the component
+    }
+};
+export const getChiTietGia = async (masp,maloai) => {
+    try {
+        const response = await api.get(`${SAN_PHAM_API_URL}lay-chi-tiet-gia`, {
+            params: { 'masp': masp,
+                'maloai': maloai
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching the list of chi tiet gia', error);
         throw error; // Optionally, rethrow the error to handle it in the component
     }
 };
@@ -224,6 +237,56 @@ export const xoaBangGia = async (mabg) => {
         const response = await api.get(`${SAN_PHAM_API_URL}xoa-bang-gia`, {
             params: {
                 'mabg': mabg
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error create DDM:', error);
+        throw error;
+    }
+};
+export const getDoanhThuSanPhamTrongNgay = async (ngay) => {
+    try {
+        const response = await api.get(`${THONG_KE_API_URL}lay-doanh-thu-san-pham-trong-ngay`, {
+            params: { 'ngay': ngay
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching san pham trong ngay', error);
+        throw error; // Optionally, rethrow the error to handle it in the component
+    }
+};
+export const themChiTietGia = async (data, maloai) => {
+    try {
+        const response = await api.post(`${SAN_PHAM_API_URL}them-chi-tiet-gia`, data, {
+            params: { maloai },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error creating CT_Gia:', error);
+        throw error;
+    }
+};
+
+export const updateChiTietGia = async (data, maloai) => {
+    try {
+        const response = await api.post(`${SAN_PHAM_API_URL}update-chi-tiet-gia`, data, {
+            params: { maloai },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error creating CT_Gia:', error);
+        throw error;
+    }
+};
+export const xoaCTGia = async (mabg,masp,maloai) => {
+    try {
+        const response = await api.get(`${SAN_PHAM_API_URL}xoa-chi-tiet-gia`, {
+            params: {
+                'mabg': mabg,
+                'masp':masp,
+                'maloai':maloai
             }
         });
         return response.data;

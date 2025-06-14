@@ -1,4 +1,4 @@
-import api,{NGUYEN_LIEU_API_URL} from "./apiConfig";
+import api,{NGUYEN_LIEU_API_URL,THONG_KE_API_URL} from "./apiConfig";
 
 export const getDanhSachNguyenLieu = async () => {
     try {
@@ -6,6 +6,24 @@ export const getDanhSachNguyenLieu = async () => {
         return response.data;
     } catch (error) {
         console.error('Error fetching the list of NL:', error);
+        throw error; // Optionally, rethrow the error to handle it in the component
+    }
+};
+export const getDanhSachNguyenLieuHienCo = async () => {
+    try {
+        const response = await api.get(`${NGUYEN_LIEU_API_URL}lay-nguyen-lieu-hien-co`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching the list of NL hien co:', error);
+        throw error; // Optionally, rethrow the error to handle it in the component
+    }
+};
+export const getSanPhamKhaDung = async () => {
+    try {
+        const response = await api.get(`${NGUYEN_LIEU_API_URL}lay-san-pham-kha-dung`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching the list of SP kha dung:', error);
         throw error; // Optionally, rethrow the error to handle it in the component
     }
 };
@@ -89,6 +107,19 @@ export const getCTDDM = async (madondat) => {
         return response.data;
     } catch (error) {
         console.error('Error get CTDDM:', error);
+        throw error;
+    }
+};
+export const getCTNhapNL = async (manl) => {
+
+    try {
+        const response = await api.get(`${NGUYEN_LIEU_API_URL}lay-chi-tiet-nhap-nguyen-lieu`, {
+            params: { manl }
+        });
+        console.log('Response data:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error get CTNHAPNL:', error);
         throw error;
     }
 };
@@ -233,4 +264,27 @@ export const formatDate = (dateString) => {
 
     // Trả về ngày tháng năm đã được định dạng
     return `${formattedDay}-${formattedMonth}-${year}`;
+};
+export const getNguyenLieuSuDungTrongNgay = async (ngay) => {
+    try {
+        const response = await api.get(`${THONG_KE_API_URL}lay-nguyen-lieu-trong-ngay`, {
+            params: { 'ngay': ngay
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching Nl trong ngay', error);
+        throw error; // Optionally, rethrow the error to handle it in the component
+    }
+};
+export const changeTrangThai = async (manl) => {
+    try {
+        const response = await api.get(`${NGUYEN_LIEU_API_URL}change-status-nguyen-lieu`, {
+            params: { 'manl': manl },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching change status:', error);
+        throw error; // Optionally, rethrow the error to handle it in the component
+    }
 };

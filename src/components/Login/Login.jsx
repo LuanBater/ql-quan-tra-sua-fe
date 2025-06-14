@@ -230,14 +230,14 @@ const Login = () => {
           </Button>
         </Box>
         <ButtonGroup>
-          <Button
+          {/* <Button
             variant="contained"
             color="primary"
             onClick={() => handleOpenDialog('register')}
             style={{ flex: 1, marginRight: '10px' }}
           >
             Đăng ký
-          </Button>
+          </Button> */}
           <Button
             variant="contained"
             color="primary"

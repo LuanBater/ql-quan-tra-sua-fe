@@ -26,8 +26,9 @@ export default function QLTS() {
             {/* Nhân viên  */}
 
           <Route path="don-hang" element={<QuanLyDonHang navItems={QLDHItems} />} />
-          {/* Khách Hàng  */}
           <Route path="mua-hang" element={<QuanLyBanHang navItems={QLMHItems} />} />
+          {/* Khách Hàng  */}
+          {/* <Route path="mua-hang" element={<QuanLyBanHang navItems={QLMHItems} />} /> */}
           <Route path="login" element={<Login />} />
         </Route>
       </Routes>

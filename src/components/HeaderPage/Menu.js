@@ -8,7 +8,7 @@ export const menuItemsQL = [
   ];
   export const menuItemsNV = [
     { name: "Trang chủ", link: "/" },
-    // { name: "Sản Phẩm", link: "/san-pham" },
+    { name: "Bán Hàng", link: "/mua-hang" },
     { name: "Đơn Hàng", link: "/don-hang" }
   ];
   export const menuItemsKH = [
@@ -17,13 +17,15 @@ export const menuItemsQL = [
   ];
   export const QLSPItems = [
     { id: 1, name: 'Danh sách sản phẩm', link: '/products' },
-    { id: 2, name: 'Thể loại', link: '/categories' },
-    { id: 3, name: 'Bảng Giá', link: '/prices' },
+    { id: 2, name: 'Sản phẩm đã bán trong ngày', link: '/san-pham-trong-ngay' },
+    { id: 3, name: 'Thể loại', link: '/categories' }
     // Add more items as needed
   ];
   export const QLNLItems = [
     { id: 1, name: 'Danh sách nguyên liệu', link: '/nguyen-lieu' },
-    { id: 2, name: 'Nguyên liệu phát sinh', link: '/phat-sinh' }
+
+    { id: 2, name: 'Nguyên liệu phát sinh', link: '/phat-sinh' },
+    { id: 3, name: 'Nguyên liệu dùng trong ngày', link: '/nguyen-lieu-trong-ngay' }
     // Add more items as needed
   ];
   export const QLNHItems = [
@@ -34,15 +36,12 @@ export const menuItemsQL = [
   ];
   export const QLMHItems = [
     { id: 1, name: 'Danh sách sản phẩm', link: '/danh-sach-san-pham' },
-    { id: 2, name: 'Giỏ hàng', link: '/gio-hang' },
-    { id: 3, name: 'Đơn hàng đã đặt', link: '/don-hang-da-dat' },
-    { id: 4, name: 'Lịch sử mua hàng', link: '/lich-su-mua-hang' }
+    { id: 2, name: 'Đơn hàng', link: '/gio-hang' }
     // Add more items as needed
   ];
   export const QLDHItems = [
-    { id: 1, name: 'Đơn hàng chờ duyệt', link: '/don-dat-cho-duyet' },
-    { id: 2, name: 'Đơn hàng đã hoàn thành', link: '/don-hang-da-hoan-thanh' },
-    { id: 3, name: 'Hóa Đơn', link: '/hoa-don' }
+    { id: 1, name: 'Đơn hàng đã hoàn thành', link: '/don-hang-da-hoan-thanh' },
+    { id: 2, name: 'Hóa Đơn', link: '/hoa-don' }
     // Add more items as needed
   ];
   export const QLTTItems = [
@@ -51,9 +50,14 @@ export const menuItemsQL = [
     // Add more items as needed
   ];
   export const QLTKItems = [
-    { id: 1, name: 'Thống kê doanh thu trong ngày', link: 'hoa-don-ngay' },
-    { id: 2, name: 'Thống kê doanh thu trong tháng', link: 'hoa-don-thang' },
-    { id: 3, name: 'Thống kê nhập hàng trong tháng', link: 'nhap-hang-thang' },
-    { id: 4, name: 'Chi phí phát sinh', link: 'chi-phi-phat-sinh' }
+    { id: 1, name: 'Thống kê doanh thu trong ngày', link: 'hoa-don-trong-ngay' },
+    { id: 2, name: 'Thống kê doanh thu trong tháng', link: 'hoa-don-trong-thang' },
+    { id: 3, name: 'Thống kê doanh thu trong quý', link: 'hoa-don-trong-quy' },
+    { id: 4, name: 'Thống kê doanh thu trong năm', link: 'hoa-don-trong-nam' },
+    { id: 5, name: 'Thống kê nguyên liệu sử dụng trong tháng', link: 'nguyen-lieu-trong-thang' },
+    { id: 6, name: 'Sản phẩm bán được trong tháng', link: 'san-pham-trong-thang' },
+    { id: 7, name: 'Nguyên liệu nhập trong tháng', link: 'nguyen-lieu-nhap-thang' },
+    { id: 8, name: 'Sản phẩm bán chạy', link: 'san-pham-ban-chay' },
+    { id: 9, name: 'Sản phẩm bán chậm', link: 'san-pham-ban-cham' }
     // Add more items as needed
   ];

@@ -20,12 +20,10 @@ export const getDanhSachTopping = async () => {
     }
 };
 
-export const taoDonHang = async (makh, sdt, diachi, thanhtoan, list_sanpham) => {
+export const taoDonHang = async (manv, thanhtoan, list_sanpham) => {
     try {
         const response = await api.post(`${MUA_HANG_API_URL}tao-don-hang`, {
-            makh,
-            sdt,
-            diachi,
+            manv,
             thanhtoan,
             list_sanpham
         });
@@ -45,6 +43,28 @@ export const getDonHangDaDatKhach = async (makh) => {
         return response.data;
     } catch (error) {
         console.error('Error fetching the list of DDK:', error);
+        throw error; // Optionally, rethrow the error to handle it in the component
+    }
+};
+export const kiemTraTrangThai = async (madonhang) => {
+    try {
+        const response = await api.get(`${MUA_HANG_API_URL}kiem-tra-trang-thai`, {
+            params: { 'madonhang': madonhang},
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error kiem tra trang thai:', error);
+        throw error; // Optionally, rethrow the error to handle it in the component
+    }
+};
+export const xoaDonHang = async (madonhang) => {
+    try {
+        const response = await api.get(`${MUA_HANG_API_URL}xoa-don-hang`, {
+            params: { 'madonhang': madonhang},
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error xoa don hang:', error);
         throw error; // Optionally, rethrow the error to handle it in the component
     }
 };
@@ -123,6 +143,44 @@ export const thanhToan = async (amount) => {
     try {
         const response = await api.get(`${THANH_TOAN_API_URL}create-payment`, {
             params: { 'amount': amount},
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching the list of DDK:', error);
+        throw error; // Optionally, rethrow the error to handle it in the component
+    }
+};
+export const MomoThanhToan = async (amount,orderId) => {
+    try {
+        const response = await api.get(`${THANH_TOAN_API_URL}momo-payment`, {
+            params: { 'amount': amount,
+                'orderId': orderId
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching the list of DDK:', error);
+        throw error; // Optionally, rethrow the error to handle it in the component
+    }
+};
+export const VNPayThanhToan = async (amount) => {
+    try {
+        const response = await api.get(`${THANH_TOAN_API_URL}create-payment`, {
+            params: { 'amount': amount,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error vnpay payment:', error);
+        throw error; // Optionally, rethrow the error to handle it in the component
+    }
+};
+export const KiemTraKhaDung = async (masp,masize) => {
+    try {
+        const response = await api.get(`${MUA_HANG_API_URL}kiem-tra-kha-dung`, {
+            params: { 'masp': masp,
+                'masize': masize
+            },
         });
         return response.data;
     } catch (error) {

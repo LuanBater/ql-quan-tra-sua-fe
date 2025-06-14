@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import "../../resource/css/content.css";
 import "../../resource/css/product.css";
+import GiaDialog from "./GiaDialog";
 import trasua01 from '../../resource/image/default-tra-sua.png';
-import {xoaCongThuc, getDanhSachSanPham, getDanhSachTheLoai, getDanhSachBangGia, 
+import {xoaCongThuc, getDanhSachSanPham, getDanhSachTheLoai, getDanhSachBangGia, getDoanhThuSanPhamTrongNgay,getChiTietGia,
         getDanhSachCongThuc,getDanhSachNguyenLieu,updateSanPham,themSanPham,
-        xoaSanPham,fetchImage, UpdateCongThuc,getBangGiaKhaDung,getBangGiaKhuyenMai,UpdateGiaKhuyenMai,xoaKhuyenMai ,changeGia,
+        xoaSanPham,fetchImage, UpdateCongThuc,getBangGiaKhuyenMai,UpdateGiaKhuyenMai,xoaKhuyenMai ,changeGia,
         formatDate, themBangGia,updateBangGia,xoaBangGia} from '../../API/QLSanPham';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -24,7 +25,8 @@ import TableRow from '@mui/material/TableRow';
 import {menuItemsQL} from '../HeaderPage/Menu.js';
 import Header from '../HeaderPage/headerpage.jsx';
 import { useNavigate } from 'react-router-dom';
-
+import { Paper, TableContainer, Typography } from '@mui/material';
+import MessageDialog from '../modal/MessageDialog.jsx';
 function QuanLySanPham ({navItems}) {
   const navigate = useNavigate();
   if(localStorage.getItem('maquyen') !== "QL") {
@@ -36,17 +38,19 @@ function QuanLySanPham ({navItems}) {
   const [activeCategory, setActiveCategory] = useState('products'); // Default to products
   const [products, setProducts] = useState([]);
   const [prices, setPrices] = useState([]);
-  const [KhaDungPrices, setKhaDungPrices] = useState([]);
-  const [KhuyenMaiPrices, setKhuyenMaiPrices] = useState([]);
+
+  const [data, setData] = useState([]);
   const [categories, setCategories] = useState([]); // Initialize categories as an empty array
   const [open, setOpen] = useState(false);
-  const [openKMDialog, setopenKMDialog] = useState(false);
-  const [openGiaDialog, setOpenGiaDialog] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
-  const [openDeletePrice, SetopenDeletePrice] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
-  const [openPrice, SetopenPrice] = useState(false);
+  const [openGiaDialog, setOpenGiaDialog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [giaList, setGiaList] = useState([]);
   const [priceNewCode, setPriceNewCode] = useState('');
+  const [searchTerm, setSearchTerm] = useState(""); // Trạng thái tìm kiếm
+  const [messageOpen, setMessageOpen] = useState(false);
+  const [messageNote, setMessage] = useState("");
   const [newProduct, setNewProduct] = useState({
     masp: '',
     tensp: '',
@@ -56,11 +60,66 @@ function QuanLySanPham ({navItems}) {
     hinhanh: '',
     mabg: 'BG01',
   });
-  const [selectBangGia, SetSelectBangGia] = useState({});
+  const handleMessageClose = () => {
+    setMessageOpen(false);
+  };
+  const handleQuantityChange = (index, newQuantity) => {
+    // Kiểm tra giá trị mới có hợp lệ không (ví dụ: không âm)
+    if (newQuantity < 0) {
+      alert("Số lượng không thể nhỏ hơn 0");
+      return;
+    }
+  
+    // Tạo bản sao của danh sách công thức
+    const updatedCongThuc = [...congThuc];
+  
+    // Cập nhật số lượng của nguyên liệu tại vị trí `index`
+    updatedCongThuc[index] = {
+      ...updatedCongThuc[index],
+      soluong: newQuantity,
+    };
+  
+    // Cập nhật lại state
+    setCongThuc(updatedCongThuc);
+  };
+  
+  const fetchChiTietGia = async (product) => {
+
+    const tempMaLoai = product.maloai === "TP" ? "TP" : "SP";
+    try {
+      const data = await getChiTietGia(product.masp,tempMaLoai);
+      setGiaList(data);
+      console.log('Fetched Products:', data);
+    } catch (error) {
+      console.error('Error fetching SanPhams:', error);
+    }
+  };
+  const handleOpenGiaDialog = async (product) => {
+    setSelectedProduct(product);
+    setOpenGiaDialog(true);
+    fetchChiTietGia(product);
+  };
+  const handleCloseGiaDialog = () => {
+    setOpenGiaDialog(false);
+    setSelectedProduct(null);
+    setGiaList([]);
+  };
   const [selectedFile, setSelectedFile] = useState(null); // State to store selected image file
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [editProduct, setEditProduct] = useState({});
-  
+   const handleFetchData = async () => {
+              if (!selectedDate) {
+                  alert("Vui lòng chọn ngày!");
+                  return;
+              }
+              try {
+                  const response = await getDoanhThuSanPhamTrongNgay(selectedDate);
+                  setData(response);
+              } catch (error) {
+                  console.error("Lỗi khi lấy dữ liệu thống kê:", error);
+                  alert("Không thể lấy dữ liệu. Vui lòng thử lại sau.");
+              }
+          };
   const handleOpenEditDialog = async (product) => {
     setEditProduct(product);
     if (String(product.hinhanh)) {
@@ -100,6 +159,7 @@ function QuanLySanPham ({navItems}) {
   const [newNguyenLieu, setNewNguyenLieu] = useState('');
   const [newSoLuong, setNewSoLuong] = useState('');
   const [newTenNL, setnewTenNL] = useState('');
+  const [newDonVi, setnewDonVi] = useState('');
   const [newMota, setNewMoTa] = useState('');
   const [NguyenLieuList, setNguyenLieuList] = useState([]);
   const [imgSP, setImgSP] = useState([]);
@@ -107,15 +167,18 @@ function QuanLySanPham ({navItems}) {
     switch (categoryId) {
       case 1:
         setActiveCategory('products');
+        setSearchTerm("");
         break;
       case 2:
-        setActiveCategory('categories');
+        setActiveCategory('san-pham-trong-ngay');
+        
         break;
       case 3:
-        setActiveCategory('prices');
+        setActiveCategory('categories');
         break;
       default:
         setActiveCategory('products'); // Default to products
+        setSearchTerm("");
     }
   };
   const getImageUrl = (file) => {
@@ -187,32 +250,8 @@ function QuanLySanPham ({navItems}) {
     useEffect(() => {
     fetchBangGia();
   }, []);
-  useEffect(() => {
-    const fetchBangGiaKhaDung = async () => {
-      try {
-        const data = await getBangGiaKhaDung();
-        setKhaDungPrices(data);
-        console.log('Fetched Prices:', data);
-      } catch (error) {
-        console.error('Error fetching BangGia:', error);
-      }
-    };
+ 
 
-    fetchBangGiaKhaDung();
-  }, []);
-  useEffect(() => {
-    const fetchBangGiaKhuyenMai = async () => {
-      try {
-        const data = await getBangGiaKhuyenMai();
-        setKhuyenMaiPrices(data);
-        console.log('Fetched Prices:', data);
-      } catch (error) {
-        console.error('Error fetching BangGia:', error);
-      }
-    };
-
-    fetchBangGiaKhuyenMai();
-  }, []);
   
   useEffect(() => {
     const fetchNguyenLieu = async () => {
@@ -286,6 +325,8 @@ function QuanLySanPham ({navItems}) {
     setSelectedFile(null);
     fetchSanPhams();
     setOpen(false); // Close the dialog
+    setMessage("Thêm Sản phẩm mới thành công!")
+    setMessageOpen(true);
   } catch (error) {
       console.error('Error adding NguyenLieu:', error);
   }
@@ -324,6 +365,7 @@ function QuanLySanPham ({navItems}) {
     const newIngredient = {
       manl: newNguyenLieu, // Assuming manl is the ID of nguyen lieu
       tennl: newTenNL,
+      donvi: newDonVi,
       soluong: newSoLuong,
       mota: newMota, // You may add description here if needed
     };
@@ -334,91 +376,39 @@ function QuanLySanPham ({navItems}) {
     setnewTenNL('');
     setNewSoLuong('');
     setNewMoTa('');
+    setnewDonVi('');
   };
   const handleDelete = async () => {
     if (editProduct) {
+      try {
         await xoaSanPham(editProduct.masp);
         fetchSanPhams();
         handleConfirmDeleteClose();
+        setMessage("Xóa sản phẩm thành công!")
+        setMessageOpen(true);
+      } catch (error) {
+        console.error('Error:', error);
+        handleConfirmDeleteClose();
+        setMessage("Xóa sản phẩm không thành công!")
+        setMessageOpen(true);
+      }
+        
     }
 };
 const handleOpenConfirmDelete = (product) => {
   setEditProduct(product);
   setOpenConfirmDelete(true);
 };
-const handleopenKMDialog = (product) => {
-  setEditProduct(product);
-  setPriceNewCode(product.mabg);
-  setopenKMDialog(true);
-};
-const handleopenGiaDialog = (product) => {
-  setEditProduct(product)
-  setOpenGiaDialog(true);
-};
-const handlePriceChange = (event) => {
-  setPriceNewCode(event.target.value);
-};
-const handleClosePriceDialog = () => {
-  setopenKMDialog(false);
-  setOpenGiaDialog(false);
-};
-const handlechangePrice = async ()=>
-{
-  if (editProduct.maloai === 'TP') {
-    editProduct.giaL = editProduct.giaM;
-  }
-  try {
-    await changeGia(editProduct.maloai,editProduct.giaM,editProduct.giaL,editProduct.idctspM,editProduct.idctspL);
-    fetchSanPhams();
-    setOpenGiaDialog(false);
-    alert('Cập nhật giá thành công!');
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Có lỗi xảy ra trong quá trình cập nhật chi tiết giá');
-  }
-}
-const handleSavePrice = async () => {
-  console.log(priceNewCode);
-  if (isMabgInKhuyenMaiList(priceNewCode,KhuyenMaiPrices)){
-  
-  const input = {
-    mabgcu: editProduct.mabg,
-    mabgmoi: priceNewCode,
-    giaM: editProduct.giaM,
-    giaL: editProduct.giaL,
-    idctspM: editProduct.idctspM,
-    idctspL:editProduct.idctspL
-  }
-  try {
-    await UpdateGiaKhuyenMai(input);
-    fetchSanPhams();
-    setopenKMDialog(false);
-    alert('Cập nhật giá khuyến mãi thành công!');
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Có lỗi xảy ra trong quá trình cập nhật chi tiết giá khuyến mãi');
-  }
-  }
-  else{
-    setopenKMDialog(false);
-    return;
-  }
-  
-};
-const handleDeleteKM = async () => {
 
-  try {
-    await xoaKhuyenMai(editProduct.mabg,editProduct.idctspM,editProduct.idctspL);
-    fetchSanPhams();
-    setopenKMDialog(false);
-    alert('Xóa giá khuyến mãi thành công!');
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Có lỗi xảy ra trong quá trình xóa khuyến mãi');
-  }
 
-  
+const handleSearchChange = (e) => {
+  setSearchTerm(e.target.value);
 };
+const filteredProducts = products.filter((product) =>
+  product.tensp.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+
 const handleConfirmDeleteClose = () => {
   setOpenConfirmDelete(false);
 };
@@ -449,84 +439,14 @@ const handleConfirmDeleteClose = () => {
         
       }
       setOpenCongThucDialog(false);
-      alert('Cập nhật công thức thành công!');
+      setMessage("Cập nhật công thức thành công!")
+      setMessageOpen(true);
     } catch (error) {
       console.error('Error:', error);
       alert('Có lỗi xảy ra trong quá trình cập nhật công thức');
     }
   };
-  const isMabgInKhuyenMaiList = (mabg, KhuyenMaiPrices) => {
-    return KhuyenMaiPrices.some(km => km.mabg === mabg);
-  };
 
-  const handleClickOpenPrice = () => {
-    SetSelectBangGia({
-       mabg: '',
-       tenbg: '',
-       tylegiam: '',
-       ngayapdung: '',
-       ngaykt: '',
-       manv: user,
-       loaigia: 'SP',
-    });
-    setIsUpdate(false);
-    SetopenPrice(true);
-};
-const handleClickOpenUpdatePrice = (bg) => {
-  SetSelectBangGia(bg);
-    setIsUpdate(true);
-    SetopenPrice(true);
-};
-const handleXoaPriceClick = (bg) => {
-  SetSelectBangGia(bg);
-    SetopenDeletePrice(true);
-};
-const handleXoaPriceClose = () => {
-  SetopenDeletePrice(false);
-};
-const handleXoaPriceSubmit = async () => {
-    try {
-        await xoaBangGia(selectBangGia.mabg);
-        await fetchBangGia();
-        handleXoaPriceClose();
-        alert("Xóa thành công")
-    } catch (error) {
-        console.error('Error Xoa BG:', error);
-    }
-};
-const handleSavePriceClick = async ()=>
-{
-    if (isUpdate)
-    {
-        try {
-            await updateBangGia(selectBangGia);
-            await fetchBangGia();
-            handleClickClosePrice();
-        } catch (error) {
-            console.error('Error update BG:', error);
-        }
-    }
-    else{
-        try {
-            await themBangGia(selectBangGia);
-            await fetchBangGia();
-            handleClickClosePrice();
-        } catch (error) {
-            console.error('Error add BG:', error);
-        }
-    }
-}
-const handleBangGiaChange = (e) => {
-    const { name, value } = e.target;
-    SetSelectBangGia({
-        ...selectBangGia,
-        [name]: value
-    });
-};
-const handleClickClosePrice = async ()=>
-    {
-        SetopenPrice(false);
-    }
 
 
   return (
@@ -547,22 +467,46 @@ const handleClickClosePrice = async ()=>
       <div className="contents-right">
         <div className="functional-content">
           {activeCategory === 'products' && (
-                <><span className="theloai-container">
-                <div className="theloai-selector">
-                  <label htmlFor="theloai">Thể loại</label>
-                  <select id="theloai" name="theloai" onChange={handleTheLoaiChange} value={selectedTheLoai}>
-                    <option value="" disabled>Chọn 1 thể loại</option>
-                    {theLoaiList.length === 0 ? (
-                      <option value="" disabled>Loading...</option>
-                    ) : (
-                      theLoaiList.map((theloai) => (
-                        <option key={theloai.maloai} value={theloai.maloai}>{theloai.tenloai}</option>
-                      ))
-                    )}
-                  </select>
+                <>
+                <div className="theloai-container">
+                  <div className="theloai-selector">
+                    <label htmlFor="theloai">Thể loại</label>
+                    <select
+                      id="theloai"
+                      name="theloai"
+                      onChange={handleTheLoaiChange}
+                      value={selectedTheLoai}
+                    >
+                      <option value="" disabled>Chọn 1 thể loại</option>
+                      {theLoaiList.length === 0 ? (
+                        <option value="" disabled>Loading...</option>
+                      ) : (
+                        theLoaiList.map((theloai) => (
+                          <option key={theloai.maloai} value={theloai.maloai}>
+                            {theloai.tenloai}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+              
+                  <div className="search-container">
+                  <label htmlFor="search">Tìm kiếm:</label>
+                  <input
+                    type="text"
+                    id="search"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    placeholder="Nhập tên sản phẩm"
+                    className="search-input" // Thêm class để chỉnh sửa ô tìm kiếm
+                  />
                 </div>
-                <p className="title">Danh sách sản phẩm</p>
-              </span>
+
+              
+                  <p className="title">Danh sách sản phẩm</p>
+                </div>
+              
+              
           
               <Button variant="outlined" onClick={handleClickOpen}>
                 Thêm mới
@@ -616,23 +560,7 @@ const handleClickClosePrice = async ()=>
                   {selectedFile && (
                     <img src={getImageUrl(selectedFile)} alt="Selected" style={{ marginTop: '10px', maxHeight: '300px', maxWidth: '100%' }} />
                   )}
-                  <TextField
-                    margin="dense"
-                    id="mabg"
-                    name="mabg"
-                    label="Chọn bảng giá"
-                    select
-                    fullWidth
-                    value={newProduct.mabg}
-                    onChange={handleNewProductChange}
-                  >
-                    {KhaDungPrices.map((price) => (
-                      <MenuItem key={price.mabg} value={price.mabg}>
-                        {price.tenbg}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-
+                 
                   <TextField
                     margin="dense"
                     id="giaM"
@@ -664,60 +592,104 @@ const handleClickClosePrice = async ()=>
                 </DialogActions>
               </Dialog>
               <div className="product-list">
-                {products.map((product) => (
-                  <div key={product.masp} className="product-item">
-                     {product.hinhanh ? (
-                        <img 
-                            src={imgSP.find(img => img.idsp === product.masp)?.image || trasua01} 
-                            alt={`Ảnh sản phẩm`} 
-                        />
-                    ) : (
-                        <img src={trasua01} alt={`Ảnh sản phẩm`} />
-                    )}
-                    <div className="product-info">
-                      <h3>ID: {product.masp} - {product.tensp}</h3>
-                      <div className="product-actions">
-                      <button onClick={() => handleopenGiaDialog(product)}>Giá</button>
-                        <button onClick={() => handleopenKMDialog(product)}>Sale</button>
-                        <button  onClick={() => handleOpenCongThucDialog(product)}>Công thức</button>
-                        <button onClick={() => handleOpenEditDialog(product) }>Sửa</button>
-                        <button onClick={() => handleOpenConfirmDelete(product)}>Xóa</button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {filteredProducts.length === 0 ? (
+  <p>Không có sản phẩm nào phù hợp.</p>
+) : (
+  filteredProducts.map((product) => (
+    <div key={product.masp} className="product-item">
+      {/* Hiển thị hình ảnh sản phẩm */}
+      <img
+        src={product.hinhanh 
+          ? imgSP.find(img => img.idsp === product.masp)?.image || trasua01 
+          : trasua01}
+        alt={`Ảnh sản phẩm`}
+      />
+      
+      <div className="product-info">
+        {/* Hiển thị thông tin sản phẩm */}
+        <h3>ID: {product.masp} - {product.tensp}</h3>
+        
+        <div className="product-actions">
+          {/* Các nút chức năng */}
+          <button onClick={() => handleOpenGiaDialog(product)}>Giá</button>
+          <button onClick={() => handleOpenCongThucDialog(product)}>Công thức</button>
+          <button onClick={() => handleOpenEditDialog(product)}>Sửa</button>
+          <button onClick={() => handleOpenConfirmDelete(product)}>Xóa</button>
+        </div>
+      </div>
+
+      {/* Hiển thị hộp thoại giá */}
+      <GiaDialog
+        open={openGiaDialog}
+        onClose={handleCloseGiaDialog}
+        product={selectedProduct}
+        giaList={giaList}
+      />
+    </div>
+  ))
+)}
+
+                
+      </div>
             </>
           )}
-          {activeCategory === 'prices' && (
-            <>
-               
-            <span className="theloai-container">
-            <Button variant="outlined" onClick={handleClickOpenPrice}>
-                  Thêm mới
-                </Button> 
-                <p className="title">Bảng giá</p>
-              </span>
-            <div className="product-list">
-              {prices.map((price) => (
-                <div key={price.mabg} className="product-item">
-                  <div className="product-info">
-                    <h3>ID: {price.mabg} - {price.tenbg}</h3>
-                    <p>Loại: {price.loaigia === 'SP' ? 'Giá sản phẩm' : 'Giá topping' }</p>
-                    <p>Tỷ lệ giảm: {price.tylegiam}%</p>
-                    <p>Ngày áp dụng: {formatDate(price.ngayapdung)}</p>
-                    <p>Ngày kết thúc: {price.ngaykt !== null ? formatDate(price.ngaykt) : ''}</p>
-                    <p>Mã nhân viên tạo: {price.manv}</p>
-                    <div className="product-actions">
-                      <Button variant="outlined"  onClick={() => handleClickOpenUpdatePrice(price)} >Sửa</Button>
-                      <Button variant="outlined" onClick={() => handleXoaPriceClick(price)} >Xóa</Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            </>
-          )}
+          {activeCategory === 'san-pham-trong-ngay' && (
+                            
+                            <>
+                                <div>
+                                <h2>Thống kê nguyên liệu sử dụng trong ngày</h2>
+                                <div style={{ marginBottom: "16px" }}>
+                                    <TextField
+                                        label="Chọn ngày"
+                                        type="date"
+                                        value={selectedDate}
+                                        onChange={(e) => setSelectedDate(e.target.value)}
+                                        InputLabelProps={{ shrink: true }}
+                                        sx={{ marginRight: "8px" }}
+                                    />
+                                    <Button variant="contained" color="primary" onClick={handleFetchData}>
+                                        Xem thống kê
+                                    </Button>
+                                </div>
+                                {data.length === 0 ? (
+                                  <Typography variant="h6" align="center" style={{ padding: '20px' }}>
+                                    Không có sản phẩm trong tháng
+                                  </Typography>
+                                ) : (
+                                  <div style={{ width: '100%', maxWidth: '800px', margin: '0 auto' }}>
+                                    <Typography variant="h6" sx={{ padding: '16px', textAlign: 'center' }}>
+                                        Thống kê sản phẩm bán được trong ngày {formatDate(selectedDate)}
+                                      </Typography>
+                                    <TableContainer component={Paper}>
+                                      <Table>
+                                        <TableHead>
+                                          <TableRow>
+                                            <TableCell  sx={{ border: '1px solid #ccc' ,width:'100px' , fontWeight: 'bold'}}>Tên sản phẩm</TableCell>
+                                            <TableCell  sx={{ border: '1px solid #ccc' ,width:'20px' , fontWeight: 'bold'}}>Size</TableCell>
+                                            <TableCell  sx={{ border: '1px solid #ccc' ,width:'50px' , fontWeight: 'bold'}} align="right">Giá bán</TableCell>
+                                            <TableCell   sx={{ border: '1px solid #ccc' ,width:'50px' , fontWeight: 'bold'}}align="right">Số lượng bán</TableCell>
+                                            <TableCell   sx={{ border: '1px solid #ccc' ,width:'50px' , fontWeight: 'bold'}}align="right">Tổng tiền (VND)</TableCell>
+                                          </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                          {data.map((row) => (
+                                            <TableRow key={row.idctsp}>
+                                              <TableCell sx={{ border: '1px solid #ccc' ,width:'100px'}}>{row.masp} - {row.tensp}</TableCell>
+                                              <TableCell sx={{ border: '1px solid #ccc' ,width:'20px'}}>{row.masize}</TableCell>
+                                              <TableCell sx={{ border: '1px solid #ccc' ,width:'50px'}} align="right">{row.giaban.toLocaleString()}đ</TableCell>
+                                              <TableCell sx={{ border: '1px solid #ccc' ,width:'50px'}} align="right">{row.soluongban}</TableCell>
+                                              <TableCell sx={{ border: '1px solid #ccc' ,width:'50px'}} align="right">{row.doanhthu.toLocaleString()}đ</TableCell>
+                                            </TableRow>
+                                          ))}
+                                        </TableBody>
+                                      </Table>
+                                    </TableContainer>
+                                  </div>
+                                )}
+                            </div>
+                         </>
+                       )}
+          
           {activeCategory === 'categories' && (
             <>
             <span className="theloai-container">
@@ -742,82 +714,113 @@ const handleClickClosePrice = async ()=>
         
       </div>
       {/* Cong thuc dialog */}
-      <Dialog open={openCongThucDialog} onClose={() => setOpenCongThucDialog(false)}>
-        <DialogTitle>Công thức sản phẩm</DialogTitle>
-        <DialogContent>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Mã NL</TableCell>
-                <TableCell>Tên NL</TableCell>
-                <TableCell>Số lượng</TableCell>
-                <TableCell>Mô tả</TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {congThuc.map((nguyenLieu, index) => (
-                <TableRow key={index}>
-                  <TableCell>{nguyenLieu.manl}</TableCell>
-                  <TableCell>{nguyenLieu.tennl}</TableCell>
-                  <TableCell>{nguyenLieu.soluong}</TableCell>
-                  <TableCell>{nguyenLieu.mota}</TableCell>
-                  <TableCell>
-                    <Button variant="outlined" onClick={() => handleDeleteNguyenLieu(index)}>Xóa</Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <div style={{ marginTop: '10px' }}>
-            <FormControl fullWidth>
-              <InputLabel id="nguyenLieuLabel">Chọn nguyên liệu</InputLabel>
-              <Select
-                labelId="nguyenLieuLabel"
-                id="nguyenLieu"
-                value={newNguyenLieu}
-                onChange={(e) => {
-                  const selectedValue = e.target.value;
-                  setNewNguyenLieu(selectedValue);
-                  const selectedIngredient = NguyenLieuList.find(item => item.manl === selectedValue);
-                  setnewTenNL(selectedIngredient.tennl);
-                }}
-                fullWidth
+      <Dialog open={openCongThucDialog} onClose={() => setOpenCongThucDialog(false)} maxWidth="md" fullWidth>
+  <DialogTitle>Công thức sản phẩm</DialogTitle>
+  <DialogContent>
+    <Table sx={{ marginTop: '10px', border: '1px solid #ccc' }}>
+      <TableHead>
+        <TableRow>
+          <TableCell><b>Mã nguyên liệu</b></TableCell>
+          <TableCell><b>Tên nguyên liệu</b></TableCell>
+          <TableCell><b>Số lượng</b></TableCell>
+          <TableCell><b>Đơn vị</b></TableCell>
+          <TableCell><b>Mô tả</b></TableCell>
+          <TableCell><b>Thao tác</b></TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {congThuc.map((nguyenLieu, index) => (
+          <TableRow key={index}>
+            <TableCell>{nguyenLieu.manl}</TableCell>
+            <TableCell>{nguyenLieu.tennl}</TableCell>
+            <TableCell>
+              <TextField
+                type="number"
+                value={nguyenLieu.soluong}
+                onChange={(e) => handleQuantityChange(index, e.target.value)}
+                size="small"
+                sx={{ width: '100px' }}
+              />
+            </TableCell>
+            <TableCell>{nguyenLieu.donvi}</TableCell>
+            <TableCell>{nguyenLieu.mota}</TableCell>
+            <TableCell>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={() => handleDeleteNguyenLieu(index)}
               >
-                {NguyenLieuList.map((nguyenLieu) => (
-                  <MenuItem key={nguyenLieu.manl} value={nguyenLieu.manl}> {nguyenLieu.manl}-{nguyenLieu.tennl}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <TextField
-              label="Số lượng"
-              type="number"
-              style={{ marginTop: '10px' }}
-              value={newSoLuong}
-              onChange={(e) => setNewSoLuong(e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label="Mô tả"
-              type="text"
-              style={{ marginTop: '10px' }}
-              value={newMota}
-              onChange={(e) => setNewMoTa(e.target.value)}
-              fullWidth
-            />
-            <Button variant="outlined" onClick={handleAddNguyenLieu} style={{ marginTop: '10px' }}>Thêm nguyên liệu</Button>
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenCongThucDialog(false)} color="secondary">
-            Đóng
-          </Button>
-          <Button onClick={handleUpdateCongThuc} color="primary">
-            Cập nhật
-          </Button>
-          
-        </DialogActions>
-      </Dialog>
+                Xóa
+              </Button>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+
+    <div style={{ marginTop: '20px' }}>
+      <p><b>Thêm nguyên liệu mới vào công thức</b></p>
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="nguyenLieuLabel">Chọn nguyên liệu</InputLabel>
+        <Select
+          labelId="nguyenLieuLabel"
+          id="nguyenLieu"
+          value={newNguyenLieu}
+          onChange={(e) => {
+            const selectedValue = e.target.value;
+            setNewNguyenLieu(selectedValue);
+
+            const selectedIngredient = NguyenLieuList.find(item => item.manl === selectedValue);
+            if (selectedIngredient) {
+              setnewTenNL(selectedIngredient.tennl);
+              setnewDonVi(selectedIngredient.donvi);
+            }
+          }}
+        >
+          {NguyenLieuList.map((nguyenLieu) => (
+            <MenuItem key={nguyenLieu.manl} value={nguyenLieu.manl}>
+              {nguyenLieu.manl} - {nguyenLieu.tennl} ({nguyenLieu.donvi})
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <TextField
+        label="Số lượng"
+        type="number"
+        fullWidth
+        margin="normal"
+        value={newSoLuong}
+        onChange={(e) => setNewSoLuong(e.target.value)}
+      />
+      <TextField
+        label="Mô tả"
+        type="text"
+        fullWidth
+        margin="normal"
+        value={newMota}
+        onChange={(e) => setNewMoTa(e.target.value)}
+      />
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleAddNguyenLieu}
+        sx={{ marginTop: '10px' }}
+      >
+        Thêm nguyên liệu
+      </Button>
+    </div>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setOpenCongThucDialog(false)} variant="outlined" color="secondary">
+      Đóng
+    </Button>
+    <Button onClick={handleUpdateCongThuc} variant="contained" color="primary">
+      Cập nhật
+    </Button>
+  </DialogActions>
+</Dialog>
+
       <Dialog open={openEditDialog} onClose={handleCloseEditDialog}>
   <DialogTitle>Chỉnh sửa sản phẩm</DialogTitle>
   <DialogContent>
@@ -877,11 +880,13 @@ const handleClickClosePrice = async ()=>
         setSelectedFile(null);
         fetchSanPhams();
         handleCloseEditDialog();
+        setMessage("Cập nhật sản phẩm thành công!")
+        setMessageOpen(true);
       } catch (error) {
         console.error('Error updating product:', error);
       }
     }} color="primary">
-      Lưu
+      Cập nhật
     </Button>
   </DialogActions>
 </Dialog>
@@ -899,190 +904,11 @@ const handleClickClosePrice = async ()=>
                  </Button>
                </DialogActions>
     </Dialog>
-    <Dialog open={openKMDialog} onClose={handleClosePriceDialog}>
-        <DialogTitle>Chi tiết khuyến mãi</DialogTitle>
-        <DialogContent>
-        {editProduct.maloai !== 'TP' && (
-          KhuyenMaiPrices.length > 0 ? (
-            <TextField
-              margin="dense"
-              id="mabg"
-              name="mabg"
-              label="Khuyến mãi khả dụng"
-              select
-              fullWidth
-              value={priceNewCode}
-              onChange= {handlePriceChange}
-            >
-              {KhuyenMaiPrices.map((price) => (
-                <MenuItem key={price.mabg} value={price.mabg}>
-                  {price.tenbg}
-                </MenuItem>
-              ))}
-            </TextField>
-          ) : (
-                <TextField
-                margin="dense"
-                id="khuyenMai"
-                name="khuyenMai"
-                fullWidth
-                value={"Không có khuyến mãi khả dụng"}
-                aria-readonly
-            />
-          )
-        )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClosePriceDialog} color="primary">
-            Đóng
-          </Button>
-          {editProduct.maloai !== 'TP' && (
-          <Button onClick={handleSavePrice} color="primary">
-            Cập nhật
-          </Button>)}
-          {editProduct.mabg && isMabgInKhuyenMaiList(editProduct.mabg, KhuyenMaiPrices) && (
-            <Button onClick={handleDeleteKM} color="secondary">
-              Xóa KM
-            </Button>
-          )}
-
-        </DialogActions>
-      </Dialog>
-      <Dialog open={openGiaDialog} onClose={handleClosePriceDialog}>
-        <DialogTitle>Chi tiết giá</DialogTitle>
-        <DialogContent>
-           {editProduct.maloai !== 'TP' && (<p>Giá Size M</p>)}
-           {editProduct.maloai === 'TP' && (<p>Giá Topping</p>)}
-          <TextField
-                    margin="dense"
-                    id="giaM"
-                    name="giaM"
-                    
-                    fullWidth
-                    value={editProduct.giaM}đ
-                    onChange={(e) => setEditProduct({ ...editProduct, giaM: e.target.value })}
-                  />
-                     {editProduct.maloai !== 'TP' && (<p>Giá Size L</p>)}
-                  {editProduct.maloai !== 'TP' && (
-                    <TextField
-                      margin="dense"
-                      id="giaL"
-                      name="giaL"
-                      
-                      fullWidth
-                      value={editProduct.giaL}đ
-                      onChange={(e) => setEditProduct({ ...editProduct, giaL: e.target.value })}
-                    />
-                  )}
-          {/* Add other price fields as needed */}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClosePriceDialog} color="primary">
-            Đóng
-          </Button>
-          <Button onClick={handlechangePrice} color="primary">
-            Cập nhật
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={openPrice} onClose={handleClickClosePrice}>
-      <DialogTitle>{isUpdate ? "Cập nhật bảng giá" : "Thêm bảng giá"}</DialogTitle>
-      <DialogContent>
-      <FormControl fullWidth margin="dense">
-       <InputLabel id="gender-label">Loại giá</InputLabel>
-         <Select
-           labelId="gender-label"
-            id="loaigia"
-            name="loaigia"
-            value={selectBangGia.loaigia}
-            onChange={handleBangGiaChange}
-            disabled={isUpdate}
-          >
-          <MenuItem value="SP">Giá sản phẩm</MenuItem>
-           <MenuItem value="TP">Giá topping</MenuItem>
-            </Select>
-          </FormControl>
-      <TextField
-          margin="dense"
-          id="mabg"
-          name="mabg"
-          label="Mã bảng giá"
-          fullWidth
-          disabled={isUpdate}
-          value={selectBangGia.mabg}
-          onChange={handleBangGiaChange}
-      />
-      <TextField
-          margin="dense"
-          id="tenbg"
-          name="tenbg"
-          label="Tên bảng giá"
-          fullWidth
-          value={selectBangGia.tenbg}
-          onChange={handleBangGiaChange}
-      />
-       <TextField
-      margin="dense"
-      type='number'
-      id="tylegiam"
-      name="tylegiam"
-      label="Tỷ lệ giảm (%)"
-      fullWidth
-      value={selectBangGia.tylegiam}
-      onChange={handleBangGiaChange}
-      />
-      <TextField
-      margin="dense"
-      id="ngayapdung"
-      name="ngayapdung"
-      label="Ngày Áp dụng"
-      type="date"
-      fullWidth
-      InputLabelProps={{
-      shrink: true,
-      }}
-      value={selectBangGia.ngayapdung}
-      onChange={handleBangGiaChange}
-      />
-      <TextField
-      margin="dense"
-      id="ngaykt"
-      name="ngaykt"
-      label="Ngày kết thúc"
-      type="date"
-      fullWidth
-      InputLabelProps={{
-      shrink: true,
-      }}
-      value={selectBangGia.ngaykt}
-      onChange={handleBangGiaChange}
-      />
-      </DialogContent>
-      <DialogActions>
-      <Button onClick={handleClickClosePrice} color="secondary">
-      Đóng
-      </Button>
-      <Button onClick={handleSavePriceClick} color="primary">
-      Lưu
-      </Button>
-      </DialogActions>
-      </Dialog>
-      <Dialog open={openDeletePrice} onClose={handleXoaPriceClose}>
-      <DialogTitle>Xóa bảng giá</DialogTitle>
-      <DialogContent>
-      <p>Bạn có chắc chắn muốn xóa bảng giá {selectBangGia.mabg} - {selectBangGia.tenbg} không?</p>
-      </DialogContent>
-      <DialogActions>
-      <Button onClick={handleXoaPriceClose} color="secondary">
-      Hủy
-      </Button>
-      <Button onClick={handleXoaPriceSubmit} color="primary">
-      Đồng ý
-      </Button>
-      </DialogActions>
-      </Dialog>
-
-
+    <MessageDialog
+                            open={messageOpen}
+                            onClose={handleMessageClose}
+                            message = {messageNote}
+                             />
     </div>
     </div>
   );
